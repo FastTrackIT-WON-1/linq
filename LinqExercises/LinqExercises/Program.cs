@@ -8,17 +8,43 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
+            foreach (Person p in PersonsDatabase.AllPersons())
+            {
+                p.Print();
+            }
+
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("Persons over 14 years with full name starting with 'M'");
+            Console.WriteLine("-----------------------------------------------------");
+
+            var query = PersonsDatabase.AllPersons()
+                .Where(p => (p.Age >= 14) &&
+                            p.FullName.StartsWith("M"));
+
+            // Or:
+            //var query = from p in PersonsDatabase.AllPersons()
+            //            where (p.Age >= 14) && p.FullName.StartsWith("M")
+            //            select p;
+
+            foreach (Person p in query)
+            {
+                p.Print();
+            }
+        }
+
+        private static void MyFirstLinqQuery()
+        {
             Console.Write("N=");
             string nValueAsString = Console.ReadLine();
-            if(!int.TryParse(nValueAsString, out int n))
+            if (!int.TryParse(nValueAsString, out int n))
             {
                 throw new ArgumentException($"'{n}' must be a numeric value");
             }
 
             // IEnumerable<int> query = NumbersGenerator.Next().Where(nr => nr % 2 == 0);
             IEnumerable<int> query = from nr in NumbersGenerator.Next()
-                        where nr % 2 == 0
-                        select nr;
+                                     where nr % 2 == 0
+                                     select nr;
 
             int count = 0;
             foreach (int element in query)
@@ -26,7 +52,7 @@ namespace LinqExercises
                 Console.WriteLine(element);
                 count++;
 
-                if(count >= n)
+                if (count >= n)
                 {
                     break;
                 }
