@@ -8,25 +8,39 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
+            int index = 0;
             foreach (Person p in PersonsDatabase.AllPersons())
             {
-                p.Print();
+                p.Print(index);
+                index++;
             }
 
             Console.WriteLine("-----------------------------------------------------");
             Console.WriteLine("Persons over 14 years with full name starting with 'M'");
             Console.WriteLine("-----------------------------------------------------");
 
-            var query = PersonsDatabase.AllPersons()
+            var query1 = PersonsDatabase.AllPersons()
                 .Where(p => (p.Age >= 14) &&
-                            p.FullName.StartsWith("M"));
+                                     p.FullName.StartsWith("M"));
 
-            // Or:
-            //var query = from p in PersonsDatabase.AllPersons()
+            //var query1 = from p in PersonsDatabase.AllPersons()
             //            where (p.Age >= 14) && p.FullName.StartsWith("M")
             //            select p;
 
-            foreach (Person p in query)
+            index = 0;
+            foreach (Person p in query1)
+            {
+                p.Print(index);
+                index++;
+            }
+
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("Persons over 14 years with full name starting with 'M' and on even index");
+            Console.WriteLine("-----------------------------------------------------");
+
+            var query2 = query1.Where((p, index) => index % 2 == 0);
+
+            foreach (Person p in query2)
             {
                 p.Print();
             }
@@ -56,6 +70,32 @@ namespace LinqExercises
                 {
                     break;
                 }
+            }
+        }
+
+        private static void Where_Basic()
+        {
+            foreach (Person p in PersonsDatabase.AllPersons())
+            {
+                p.Print();
+            }
+
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("Persons over 14 years with full name starting with 'M'");
+            Console.WriteLine("-----------------------------------------------------");
+
+            var query = PersonsDatabase.AllPersons()
+                .Where(p => (p.Age >= 14) &&
+                            p.FullName.StartsWith("M"));
+
+            // Or:
+            //var query = from p in PersonsDatabase.AllPersons()
+            //            where (p.Age >= 14) && p.FullName.StartsWith("M")
+            //            select p;
+
+            foreach (Person p in query)
+            {
+                p.Print();
             }
         }
     }
