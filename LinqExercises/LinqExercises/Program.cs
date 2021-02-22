@@ -9,16 +9,7 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            var query = PersonsDatabase.AllPersons()
-                .Select((p, index) => new { Name = p.FullName, Index = index });
-
-            //IEnumerable<string> query = from p in PersonsDatabase.AllPersons()
-            //                            select p.FullName;
-
-            foreach (var personNameAndIndex in query)
-            {
-                Console.WriteLine($"{personNameAndIndex.Index}) {personNameAndIndex.Name}");
-            }
+            
         }
 
         private static void MyFirstLinqQuery()
@@ -112,6 +103,60 @@ namespace LinqExercises
             {
                 p.Print();
             }
+        }
+
+        private static void Select_Basic_And_With_Index()
+        {
+            var query = PersonsDatabase.AllPersons()
+                .Select((p, index) => new { Name = p.FullName, Index = index });
+
+            //IEnumerable<string> query = from p in PersonsDatabase.AllPersons()
+            //                            select p.FullName;
+
+            foreach (var personNameAndIndex in query)
+            {
+                Console.WriteLine($"{personNameAndIndex.Index}) {personNameAndIndex.Name}");
+            }
+        }
+
+        private static void SelectMany_Basic()
+        {
+            int[] collection = { 1, 2, 3 };
+
+            // Result should be:
+            // 1, 1, 1, 2, 4, 8, 3, 9, 27 ;
+
+            var query = collection.SelectMany(nr => new int[] { nr, nr * nr, nr * nr * nr });
+            //var query = from nr in collection
+            //            from powers in new[] { nr, nr * nr, nr * nr * nr }
+            //            select powers;
+
+            foreach (int nr in query)
+            {
+                Console.Write($"{nr}, ");
+            }
+        }
+
+        private static void SelectMany_Advanced()
+        {
+            int[] a = { 2, 3, 4, 5 };
+            int[] b = { 4, 5, 6, 7, 8 };
+
+            //var query = a
+            //    .SelectMany(
+            //        elem1 => b, 
+            //        (elem1, elem2) => new { Element1 = elem1, Element2 = elem2 })
+            //    .Where(
+            //        pair => Math.Abs(pair.Element1 - pair.Element2) == 1)
+            //    .Select(
+            //        pair => $"({pair.Element1}, {pair.Element2})");
+
+            var query = from elem1 in a
+                        from elem2 in b
+                        where Math.Abs(elem1 - elem2) == 1
+                        select $"({elem1}, {elem2})";
+
+            Console.WriteLine(string.Join(", ", query));
         }
     }
 }
