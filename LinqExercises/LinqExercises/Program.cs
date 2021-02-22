@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,41 +9,15 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            int index = 0;
-            foreach (Person p in PersonsDatabase.AllPersons())
+            var query = PersonsDatabase.AllPersons()
+                .Select((p, index) => new { Name = p.FullName, Index = index });
+
+            //IEnumerable<string> query = from p in PersonsDatabase.AllPersons()
+            //                            select p.FullName;
+
+            foreach (var personNameAndIndex in query)
             {
-                p.Print(index);
-                index++;
-            }
-
-            Console.WriteLine("-----------------------------------------------------");
-            Console.WriteLine("Persons over 14 years with full name starting with 'M'");
-            Console.WriteLine("-----------------------------------------------------");
-
-            var query1 = PersonsDatabase.AllPersons()
-                .Where(p => (p.Age >= 14) &&
-                                     p.FullName.StartsWith("M"));
-
-            //var query1 = from p in PersonsDatabase.AllPersons()
-            //            where (p.Age >= 14) && p.FullName.StartsWith("M")
-            //            select p;
-
-            index = 0;
-            foreach (Person p in query1)
-            {
-                p.Print(index);
-                index++;
-            }
-
-            Console.WriteLine("-----------------------------------------------------");
-            Console.WriteLine("Persons over 14 years with full name starting with 'M' and on even index");
-            Console.WriteLine("-----------------------------------------------------");
-
-            var query2 = query1.Where((p, index) => index % 2 == 0);
-
-            foreach (Person p in query2)
-            {
-                p.Print();
+                Console.WriteLine($"{personNameAndIndex.Index}) {personNameAndIndex.Name}");
             }
         }
 
@@ -94,6 +69,46 @@ namespace LinqExercises
             //            select p;
 
             foreach (Person p in query)
+            {
+                p.Print();
+            }
+        }
+
+        private static void Where_With_Index()
+        {
+            int index = 0;
+            foreach (Person p in PersonsDatabase.AllPersons())
+            {
+                p.Print(index);
+                index++;
+            }
+
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("Persons over 14 years with full name starting with 'M'");
+            Console.WriteLine("-----------------------------------------------------");
+
+            var query1 = PersonsDatabase.AllPersons()
+                .Where(p => (p.Age >= 14) &&
+                                     p.FullName.StartsWith("M"));
+
+            //var query1 = from p in PersonsDatabase.AllPersons()
+            //            where (p.Age >= 14) && p.FullName.StartsWith("M")
+            //            select p;
+
+            index = 0;
+            foreach (Person p in query1)
+            {
+                p.Print(index);
+                index++;
+            }
+
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("Persons over 14 years with full name starting with 'M' and on even index");
+            Console.WriteLine("-----------------------------------------------------");
+
+            var query2 = query1.Where((p, index) => index % 2 == 0);
+
+            foreach (Person p in query2)
             {
                 p.Print();
             }
