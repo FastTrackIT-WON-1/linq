@@ -9,7 +9,8 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            
+            var theSinglePerson = PersonsDatabase.AllPersons().ElementAtOrDefault(2);
+            theSinglePerson?.Print();
         }
 
         private static void MyFirstLinqQuery()
@@ -157,6 +158,150 @@ namespace LinqExercises
                         select $"({elem1}, {elem2})";
 
             Console.WriteLine(string.Join(", ", query));
+        }
+
+        private static void OrderBy_Basic()
+        {
+            //var query = PersonsDatabase.AllPersons()
+            //    .Where(p => (p.Age > 20) && (p.Age < 40))
+            //    .OrderBy(p => p.Age)
+            //    .ThenByDescending(p => p.FullName);
+
+            var query = from p in PersonsDatabase.AllPersons()
+                        where (p.Age > 20) && (p.Age < 40)
+                        orderby p.Age ascending, p.FullName descending
+                        select p;
+
+            foreach (Person p in query)
+            {
+                p.Print();
+            }
+        }
+
+        private static void GroupBy_Basic()
+        {
+            var query = from p in PersonsDatabase.AllPersons()
+                        where p.Age > 30
+                        orderby p.DateOfBirth.Year ascending
+                        group p by p.DateOfBirth.Year into yearsGroups
+                        where (yearsGroups.Key >= 1950) && (yearsGroups.Key <= 1970)
+                        select yearsGroups;
+
+            //var query = PersonsDatabase.AllPersons()
+            //    .Where(p => p.Age > 30)
+            //    .OrderBy(p => p.DateOfBirth.Year)
+            //    .GroupBy(p => p.Age);
+
+            foreach (var group in query)
+            {
+                Console.WriteLine("--------------");
+                Console.WriteLine($"Persons born in year: {group.Key}");
+                Console.WriteLine("--------------");
+
+                foreach (var p in group)
+                {
+                    p.Print();
+                }
+            }
+        }
+
+        private static void Union_WithCustomEquality()
+        {
+            var p1 = new Person("James", "Smith", new DateTime(1975, 2, 24), Gender.Male);
+            var p2 = new Person("Mary", "Brown", new DateTime(1985, 2, 24), Gender.Female);
+            var p3 = new Person("James", "Smith", new DateTime(1975, 2, 24), Gender.Male);
+            var p4 = new Person("Nancy", "Jones", new DateTime(1991, 2, 24), Gender.Female);
+
+            Person[] persons1 = new Person[] { p1, p2 };
+
+            Person[] persons2 = new Person[] { p3, p4 };
+
+            //var query = persons1.Union(
+            //    persons2,
+            //    new PersonsEqualityComparer());
+
+            var query = persons1.Union(
+                persons2,
+                new LambdaEqualityComparer<Person>(
+                    (x, y) => string.Equals(x.FirstName, y.FirstName) &&
+                              string.Equals(x.LastName, y.LastName) &&
+                              (x.DateOfBirth == y.DateOfBirth) &&
+                              (x.Gender == y.Gender),
+                    x => HashCode.Combine(x.FirstName, x.LastName, x.DateOfBirth, x.Gender)));
+
+            foreach (var p in query)
+            {
+                p.Print();
+            }
+
+            int[] ints1 = { 1, 2, 3 };
+            int[] ints2 = { 2, 3, 4 };
+
+            var query2 = ints1.Union(ints2);
+            Console.WriteLine(string.Join(", ", query2));
+        }
+
+        private static void DefaultIfEmpty_Basic()
+        {
+            var p1 = new Person("James", "Smith", new DateTime(1975, 2, 24), Gender.Male);
+            var p2 = new Person("Mary", "Brown", new DateTime(1985, 2, 24), Gender.Female);
+            var p3 = new Person("James", "Smith", new DateTime(1975, 2, 24), Gender.Male);
+            var p4 = new Person("Nancy", "Jones", new DateTime(1991, 2, 24), Gender.Female);
+
+            // Person[] persons1 = null;
+            Person[] persons2 = new Person[] { };
+            Person[] persons3 = new Person[] { p1, p2, p3, p4 };
+
+            foreach (var arrayOfPersons in new[] { persons2, persons3 })
+            {
+                var query = arrayOfPersons.DefaultIfEmpty();
+                foreach (var p in query)
+                {
+                    if (p is null)
+                    {
+                        Console.WriteLine("p is null");
+                    }
+                    else
+                    {
+                        p.Print();
+                    }
+
+                }
+
+                Console.WriteLine(" --------------------------------- ");
+            }
+
+            int[] ints1 = new int[0];
+            int[] ints2 = { 1, 2, 3, 4 };
+            foreach (var arrayOfInts in new[] { ints1, ints2 })
+            {
+                var query = arrayOfInts.DefaultIfEmpty();
+                Console.WriteLine(string.Join(", ", query));
+                Console.WriteLine(" --------------------------------- ");
+            }
+        }
+
+        private static void Zip_Vs_SelectMany()
+        {
+            int[] array1 = { 1, 2, 3, };
+            string[] array2 = { "one", "two", "three", "four", "five" };
+
+            var query1 = array1.Zip(array2, (first, second) => $"{first} {second}");
+            foreach (var element in query1)
+            {
+                Console.WriteLine(element);
+            }
+
+            Console.WriteLine(" ------------------------------- ");
+
+            var query2 = array1.SelectMany(
+                (first) => array2,
+                (first, second) => $"{first} {second}");
+
+            foreach (var element in query2)
+            {
+                Console.WriteLine(element);
+            }
         }
     }
 }
