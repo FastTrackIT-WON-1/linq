@@ -9,38 +9,48 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            var query = from product in ProductsDatabase.Products
-                        join category in ProductsDatabase.Categories on product.CategoryId equals category.Id
+            var query = from category in ProductsDatabase.Categories
+                        join product in ProductsDatabase.Products on category.Id equals product.CategoryId into categoryGroup
                         select new
                         {
-                            product.Id,
-                            ProductName = product.Name,
-                            CategoryName = category.Name
+                            category.Id,
+                            CategoryName = category.Name,
+                            Products = categoryGroup
                         };
 
-            var queryExt = ProductsDatabase.Products
-                .Join(
-                    ProductsDatabase.Categories,
-                    prod => prod.CategoryId,
-                    cat => cat.Id,
-                    (prod, cat) => new
-                    {
-                        prod.Id,
-                        ProductName = prod.Name,
-                        CategoryName = cat.Name
-                    });
-
+            var queryExt = ProductsDatabase.Categories.GroupJoin(
+                ProductsDatabase.Products,
+                cat => cat.Id,
+                prod => prod.CategoryId,
+                (cat, products) => new
+                {
+                    cat.Id,
+                    CategoryName = cat.Name,
+                    Products = products
+                });
 
             foreach (var result in query)
             {
-                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+
+                // Employee
+                // Project
+                // Employee - to - project n - m
+                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
+                foreach (var product in result.Products)
+                {
+                    Console.WriteLine($"    - {product.Id} - {product.Name}");
+                }
             }
 
             Console.WriteLine("------------------------------------");
 
             foreach (var result in queryExt)
             {
-                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
+                foreach (var product in result.Products)
+                {
+                    Console.WriteLine($"    - {product.Id} - {product.Name}");
+                }
             }
         }
 
@@ -332,6 +342,43 @@ namespace LinqExercises
             foreach (var element in query2)
             {
                 Console.WriteLine(element);
+            }
+        }
+
+        private static void Join_Basic()
+        {
+            var query = from product in ProductsDatabase.Products
+                        join category in ProductsDatabase.Categories on product.CategoryId equals category.Id
+                        select new
+                        {
+                            product.Id,
+                            ProductName = product.Name,
+                            CategoryName = category.Name
+                        };
+
+            var queryExt = ProductsDatabase.Products
+                .Join(
+                    ProductsDatabase.Categories,
+                    prod => prod.CategoryId,
+                    cat => cat.Id,
+                    (prod, cat) => new
+                    {
+                        prod.Id,
+                        ProductName = prod.Name,
+                        CategoryName = cat.Name
+                    });
+
+
+            foreach (var result in query)
+            {
+                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+            }
+
+            Console.WriteLine("------------------------------------");
+
+            foreach (var result in queryExt)
+            {
+                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
             }
         }
     }
