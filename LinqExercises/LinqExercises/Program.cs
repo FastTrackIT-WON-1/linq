@@ -9,49 +9,7 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            var query = from category in ProductsDatabase.Categories
-                        join product in ProductsDatabase.Products on category.Id equals product.CategoryId into categoryGroup
-                        select new
-                        {
-                            category.Id,
-                            CategoryName = category.Name,
-                            Products = categoryGroup
-                        };
-
-            var queryExt = ProductsDatabase.Categories.GroupJoin(
-                ProductsDatabase.Products,
-                cat => cat.Id,
-                prod => prod.CategoryId,
-                (cat, products) => new
-                {
-                    cat.Id,
-                    CategoryName = cat.Name,
-                    Products = products
-                });
-
-            foreach (var result in query)
-            {
-
-                // Employee
-                // Project
-                // Employee - to - project n - m
-                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
-                foreach (var product in result.Products)
-                {
-                    Console.WriteLine($"    - {product.Id} - {product.Name}");
-                }
-            }
-
-            Console.WriteLine("------------------------------------");
-
-            foreach (var result in queryExt)
-            {
-                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
-                foreach (var product in result.Products)
-                {
-                    Console.WriteLine($"    - {product.Id} - {product.Name}");
-                }
-            }
+            
         }
 
         private static void MyFirstLinqQuery()
@@ -377,6 +335,71 @@ namespace LinqExercises
             Console.WriteLine("------------------------------------");
 
             foreach (var result in queryExt)
+            {
+                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+            }
+        }
+
+        private static void Join_GroupJoin()
+        {
+            var query = from category in ProductsDatabase.Categories
+                        join product in ProductsDatabase.Products on category.Id equals product.CategoryId into categoryGroup
+                        select new
+                        {
+                            category.Id,
+                            CategoryName = category.Name,
+                            Products = categoryGroup
+                        };
+
+            var queryExt = ProductsDatabase.Categories.GroupJoin(
+                ProductsDatabase.Products,
+                cat => cat.Id,
+                prod => prod.CategoryId,
+                (cat, products) => new
+                {
+                    cat.Id,
+                    CategoryName = cat.Name,
+                    Products = products
+                });
+
+            foreach (var result in query)
+            {
+
+                // Employee
+                // Project
+                // Employee - to - project n - m
+                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
+                foreach (var product in result.Products)
+                {
+                    Console.WriteLine($"    - {product.Id} - {product.Name}");
+                }
+            }
+
+            Console.WriteLine("------------------------------------");
+
+            foreach (var result in queryExt)
+            {
+                Console.WriteLine($"{result.Id} Category: {result.CategoryName}");
+                foreach (var product in result.Products)
+                {
+                    Console.WriteLine($"    - {product.Id} - {product.Name}");
+                }
+            }
+        }
+
+        private static void Join_OuterJoinSimulation()
+        {
+            var query = from product in ProductsDatabase.Products
+                        join category in ProductsDatabase.Categories on product.CategoryId equals category.Id into categoriesGroup
+                        from cat in categoriesGroup.DefaultIfEmpty(new Category(-1, "N/A"))
+                        select new
+                        {
+                            product.Id,
+                            ProductName = product.Name,
+                            CategoryName = cat.Name
+                        };
+
+            foreach (var result in query)
             {
                 Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
             }

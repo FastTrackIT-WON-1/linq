@@ -69,6 +69,9 @@ namespace LinqExercises
             yield return new Product(NewId(), "Huawei Tablet", 3);
             yield return new Product(NewId(), "Lenovo Tablet", 3);
             yield return new Product(NewId(), "iPad", 3);
+
+            // Electrocasnice
+            yield return new Product(NewId(), "Frigider", 4);
         }
     }
 }
