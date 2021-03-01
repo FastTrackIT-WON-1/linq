@@ -9,8 +9,39 @@ namespace LinqExercises
     {
         static void Main(string[] args)
         {
-            var theSinglePerson = PersonsDatabase.AllPersons().ElementAtOrDefault(2);
-            theSinglePerson?.Print();
+            var query = from product in ProductsDatabase.Products
+                        join category in ProductsDatabase.Categories on product.CategoryId equals category.Id
+                        select new
+                        {
+                            product.Id,
+                            ProductName = product.Name,
+                            CategoryName = category.Name
+                        };
+
+            var queryExt = ProductsDatabase.Products
+                .Join(
+                    ProductsDatabase.Categories,
+                    prod => prod.CategoryId,
+                    cat => cat.Id,
+                    (prod, cat) => new
+                    {
+                        prod.Id,
+                        ProductName = prod.Name,
+                        CategoryName = cat.Name
+                    });
+
+
+            foreach (var result in query)
+            {
+                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+            }
+
+            Console.WriteLine("------------------------------------");
+
+            foreach (var result in queryExt)
+            {
+                Console.WriteLine($"{result.Id} - {result.ProductName} (category: {result.CategoryName})");
+            }
         }
 
         private static void MyFirstLinqQuery()
